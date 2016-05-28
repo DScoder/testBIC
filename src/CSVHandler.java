@@ -11,10 +11,10 @@ public class CSVHandler {
 
     private List<String[]> csvData = new ArrayList<>();
     private String csvSplitBy = ";";
+    
     private ArrayList<String[]> group;
     private ArrayList<ArrayList<String[]>> groups;
-    private LinkedList<String[]> csvDataLinked;
-
+    private int checkedGroup;
     long start;
 
     public void readCVS(String path){
@@ -35,56 +35,50 @@ public class CSVHandler {
     }
 
     public void groupCSVData(){
-        start = System.currentTimeMillis();
-        csvDataLinked = new LinkedList<>();
-        csvDataLinked.addAll(csvData);
         groups = new ArrayList<>();
-        System.out.println("Copy ArrayList to LinkedList : " + ( System.currentTimeMillis() - start ) + " ms");
+        Iterator<String[]> itr = csvData.listIterator();
+        group = new ArrayList<>();
+        group.add(itr.next());
+        groups.add(group);
 
         start = System.currentTimeMillis();
-        ListIterator<String[]> itr;
         String[] str;
-        if (!csvData.isEmpty()){
-            while (!csvDataLinked.isEmpty()){
+        while (itr.hasNext()) {
+            str = itr.next();
+            if (checkData(str)){
+                groups.get(checkedGroup).add(str);
+            } else {
                 group = new ArrayList<>();
-                itr = csvDataLinked.listIterator(0);
-                while (itr.hasNext()) {
-                    str = itr.next();
-                    if (group.isEmpty() || checkData(str)){
-                        group.add(str);
-                        itr.remove();
-                    }
-                }
+                group.add(str);
                 groups.add(group);
             }
         }
-        System.out.println("Group ready in : " + ( System.currentTimeMillis() - start ) + " ms");
+        System.out.println("Grouping of " + csvData.size() + " records ready in: " + ( System.currentTimeMillis() - start ) + " ms");
     }
-    
 
     private boolean checkData(String[] str){
-            for (int j = 0; j < group.size(); j++) {
-                for (int k = 0; k < group.get(j).length; k++) {
-                    for (int l = 0; l < str.length; l++) {
-                        if (!str[l].equals("\"\"") && group.get(j)[l].equals(str[l]) ){
-                            return true;
-                        }
-                    }
+        for (int i = 0; i < groups.size(); i++) {
+            checkedGroup = i;
+            for (int j = 0; j < groups.get(i).size(); j++) {
+                for (int l = 0; l < str.length; l++) {
+                    if (!str[l].equals("\"\"") && groups.get(i).get(j)[l].equals(str[l]) )
+                        return true;
                 }
             }
+        }
         return false;
     }
 
-    public void soutGroup(){
-//        for (int i = 0; i < groups.size(); i++) {
-//            System.out.println(i+1 + ") " + groups.get(i).size() );
-//        }
-        int i = 3;
-        System.out.println(groups.size() + groups.get(i).get(0)[0] + groups.get(i).get(0)[1] + groups.get(i).get(0)[2]);
-    }
-
-
-    public List<String[]> getCsvDataLinked() {
-        return csvDataLinked;
+    public void groupInfo(){
+        System.out.println("\nGroups info:");
+        System.out.println("Groups size: " + groups.size());
+        for (int i = 0; i < groups.size(); i++) {
+            if (groups.get(i).size() > 1){
+                System.out.println("Group number " + i+1 + " have "+ groups.get(i).size() + " same results:");
+                for (int j = 0; j < groups.get(i).size(); j++) {
+                   System.out.println(groups.get(i).get(j)[0] + groups.get(i).get(j)[1] + groups.get(i).get(j)[2]);
+                }
+            }
+        }
     }
 }
