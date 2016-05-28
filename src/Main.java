@@ -9,12 +9,11 @@ public class Main {
 
         String path = "src\\resources\\lng.csv";
 
-        CVSHandler cvsHandler = new CVSHandler();
-        cvsHandler.readCVS(path);
+        CSVHandler handler = new CSVHandler();
+        handler.readCVS(path);
+        handler.groupCSVData();
 
-        for (int i = 0; i < 10; i++) {
-            System.out.println(i+1 + ") " + cvsHandler.getCsvData().get(i));
-        }
+        handler.soutGroup();
 
     }
 }
